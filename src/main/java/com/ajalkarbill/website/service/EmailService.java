@@ -1,0 +1,107 @@
+package com.ajalkarbill.website.service;
+
+import com.ajalkarbill.website.entity.ContactEnquiry;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+import java.time.format.DateTimeFormatter;
+
+@Service
+public class EmailService {
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    private static final String ADMIN_EMAIL = "support@ajalkarinfotechindia.com";
+    private static final String BRAND_COLOR = "#2563EB";
+
+    @Async
+    public void sendAdminNotification(ContactEnquiry enquiry) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(ADMIN_EMAIL);
+            helper.setSubject("🚀 New Website Enquiry - AjalkarBill [" + enquiry.getEnquiryId() + "]");
+
+            String htmlContent = buildAdminEmailTemplate(enquiry);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            System.err.println("Failed to send admin email: " + e.getMessage());
+        }
+    }
+
+    @Async
+    public void sendCustomerConfirmation(ContactEnquiry enquiry) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(enquiry.getEmail());
+            helper.setSubject("Thank You for Contacting AjalkarBill");
+
+            String htmlContent = buildCustomerEmailTemplate(enquiry);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            System.err.println("Failed to send customer email: " + e.getMessage());
+        }
+    }
+
+    private String buildAdminEmailTemplate(ContactEnquiry e) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = e.getCreatedAt().format(formatter);
+
+        return "<html><body style='font-family: Arial, sans-serif; color: #333; background-color: #f4f6f9; padding: 20px;'>" +
+                "<div style='max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);'>" +
+                "<div style='background: " + BRAND_COLOR + "; padding: 20px; text-align: center; color: white;'>" +
+                "<h2>New Enquiry Received</h2>" +
+                "</div>" +
+                "<div style='padding: 20px;'>" +
+                "<table style='width: 100%; border-collapse: collapse;'>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Enquiry ID:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getEnquiryId() + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Customer Name:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getFullName() + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Company Name:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + (e.getCompanyName() != null ? e.getCompanyName() : "N/A") + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Email:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getEmail() + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Mobile:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getMobileNumber() + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Type:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getEnquiryType() + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Subject:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getSubject() + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + formattedDate + "</td></tr>" +
+                "<tr><td style='padding: 10px; border-bottom: 1px solid #eee;'><strong>Page Source:</strong></td><td style='padding: 10px; border-bottom: 1px solid #eee;'>" + e.getPageSource() + "</td></tr>" +
+                "</table>" +
+                "<div style='margin-top: 20px; padding: 15px; background: #f8fafc; border-left: 4px solid " + BRAND_COLOR + ";'>" +
+                "<strong>Message:</strong><br/>" + e.getMessage().replace("\n", "<br/>") +
+                "</div>" +
+                "</div>" +
+                "</div></body></html>";
+    }
+
+    private String buildCustomerEmailTemplate(ContactEnquiry e) {
+        return "<html><body style='font-family: Arial, sans-serif; color: #333; background-color: #f4f6f9; padding: 20px;'>" +
+                "<div style='max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);'>" +
+                "<div style='background: " + BRAND_COLOR + "; padding: 20px; text-align: center; color: white;'>" +
+                "<h2>Thank You for Contacting AjalkarBill</h2>" +
+                "</div>" +
+                "<div style='padding: 20px;'>" +
+                "<p>Dear <strong>" + e.getFullName() + "</strong>,</p>" +
+                "<p>Thank you for reaching out to us. We have successfully received your enquiry.</p>" +
+                "<div style='margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 6px; text-align: center;'>" +
+                "<strong>Reference Number:</strong> <span style='color: " + BRAND_COLOR + "; font-size: 1.2em;'>" + e.getEnquiryId() + "</span>" +
+                "</div>" +
+                "<p>Our team is currently reviewing your request. You can expect a response from our product experts <strong>within 24 hours</strong>.</p>" +
+                "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'/>" +
+                "<h4>Contact Details:</h4>" +
+                "<p>Email: <a href='mailto:support@ajalkarinfotechindia.com'>support@ajalkarinfotechindia.com</a><br/>" +
+                "Website: <a href='https://www.ajalkarbill.com'>www.ajalkarbill.com</a></p>" +
+                "</div>" +
+                "</div></body></html>";
+    }
+}
