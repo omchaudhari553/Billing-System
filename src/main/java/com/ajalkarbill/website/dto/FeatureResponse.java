@@ -3,11 +3,12 @@ package com.ajalkarbill.website.dto;
 import java.time.LocalDateTime;
 
 public class FeatureResponse {
-    
+
     private Long id;
     private String title;
     private String description;
     private String icon;
+    private String category;
     private Boolean isActive;
     private Integer displayOrder;
     private LocalDateTime createdAt;
@@ -46,6 +47,14 @@ public class FeatureResponse {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Boolean getIsActive() {

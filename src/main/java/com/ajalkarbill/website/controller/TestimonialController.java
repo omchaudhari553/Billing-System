@@ -1,10 +1,9 @@
 package com.ajalkarbill.website.controller;
 
 import com.ajalkarbill.website.dto.TestimonialDto;
+import com.ajalkarbill.website.dto.TestimonialSummaryDto;
 import com.ajalkarbill.website.service.TestimonialService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +19,20 @@ public class TestimonialController {
     @GetMapping
     public List<TestimonialDto> getTestimonials() {
         return service.getAllTestimonials();
+    }
+
+    @GetMapping("/featured")
+    public List<TestimonialDto> getFeaturedTestimonials() {
+        return service.getFeaturedTestimonials();
+    }
+
+    @GetMapping("/rating/{rating}")
+    public List<TestimonialDto> getTestimonialsByRating(@PathVariable int rating) {
+        return service.getTestimonialsByRating(rating);
+    }
+
+    @GetMapping("/summary")
+    public TestimonialSummaryDto getTestimonialSummary() {
+        return service.getTestimonialSummary();
     }
 }

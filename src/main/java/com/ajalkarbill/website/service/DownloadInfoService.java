@@ -15,10 +15,39 @@ public class DownloadInfoService {
         this.repository = repository;
     }
 
+    public List<DownloadInfoDto> getAllDownloads() {
+        return repository.findAll().stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
+    public DownloadInfoDto getDownloadById(Long id) {
+        DownloadInfo info = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Download not found with id: " + id));
+        return mapToDto(info);
+    }
+
     public DownloadInfoDto getLatestDownloadInfo() {
-        List<DownloadInfo> infos = repository.findAll();
-        if (infos.isEmpty()) return null;
-        DownloadInfo info = infos.get(0);
-        return new DownloadInfoDto(info.getId(), info.getLatestVersion(), info.getDownloadLink(), info.getReleaseDate(), info.getOsSupport());
+        DownloadInfo info = repository.findFirstByOrderByIdDesc();
+        if (info == null)
+            return null;
+        return mapToDto(info);
+    }
+
+    public DownloadInfoDto getDownloadFile(Long id) {
+        DownloadInfo info = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Download not found with id: " + id));
+        return mapToDto(info);
+    }
+
+    private DownloadInfoDto mapToDto(DownloadInfo info) {
+        return new DownloadInfoDto(
+                info.getId(),
+                info.getLatestVersion(),
+                info.getDownloadLink(),
+                info.getReleaseDate(),
+                info.getOsSupport(),
+                info.getFileName(),
+                info.getFileSize());
     }
 }

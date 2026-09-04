@@ -4,16 +4,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class FeatureRequest {
-    
+
     @NotBlank(message = "Title is required")
     private String title;
-    
+
     private String description;
     private String icon;
-    
+    private String category;
+
     @NotNull(message = "Active status is required")
     private Boolean isActive;
-    
+
     @NotNull(message = "Display order is required")
     private Integer displayOrder;
 
@@ -42,6 +43,14 @@ public class FeatureRequest {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Boolean getIsActive() {

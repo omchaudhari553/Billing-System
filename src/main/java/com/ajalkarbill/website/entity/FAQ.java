@@ -16,6 +16,9 @@ public class FAQ {
 
     private String question;
     private String answer;
+    private String category;
+    private Integer helpfulCount = 0;
+    private Boolean isFeatured = false;
 
     @Column(nullable = false)
     private Boolean isActive = true;
@@ -61,6 +64,30 @@ public class FAQ {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getHelpfulCount() {
+        return helpfulCount;
+    }
+
+    public void setHelpfulCount(Integer helpfulCount) {
+        this.helpfulCount = helpfulCount;
+    }
+
+    public Boolean getIsFeatured() {
+        return isFeatured;
+    }
+
+    public void setIsFeatured(Boolean isFeatured) {
+        this.isFeatured = isFeatured;
     }
 
     public Boolean getIsActive() {

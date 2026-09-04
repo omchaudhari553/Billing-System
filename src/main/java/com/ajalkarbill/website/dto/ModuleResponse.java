@@ -1,13 +1,15 @@
 package com.ajalkarbill.website.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ModuleResponse {
-    
+
     private Long id;
     private String name;
     private String description;
     private String icon;
+    private List<FeatureResponse> features;
     private Boolean isActive;
     private Integer displayOrder;
     private LocalDateTime createdAt;
@@ -46,6 +48,14 @@ public class ModuleResponse {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public List<FeatureResponse> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<FeatureResponse> features) {
+        this.features = features;
     }
 
     public Boolean getIsActive() {

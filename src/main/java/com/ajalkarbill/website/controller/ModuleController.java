@@ -1,10 +1,10 @@
 package com.ajalkarbill.website.controller;
 
+import com.ajalkarbill.website.dto.FeatureResponse;
 import com.ajalkarbill.website.dto.ModuleResponse;
 import com.ajalkarbill.website.service.ModuleServiceAdmin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ajalkarbill.website.service.impl.ModuleServiceAdminImpl;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,13 +12,30 @@ import java.util.List;
 @RequestMapping("/api/modules")
 public class ModuleController {
     private final ModuleServiceAdmin service;
+    private final ModuleServiceAdminImpl serviceImpl;
 
-    public ModuleController(ModuleServiceAdmin service) {
+    public ModuleController(ModuleServiceAdmin service, ModuleServiceAdminImpl serviceImpl) {
         this.service = service;
+        this.serviceImpl = serviceImpl;
     }
 
     @GetMapping
     public List<ModuleResponse> getModules() {
         return service.getActiveModules();
+    }
+
+    @GetMapping("/{id}")
+    public ModuleResponse getModuleById(@PathVariable Long id) {
+        return service.getModuleById(id);
+    }
+
+    @GetMapping("/{id}/features")
+    public List<FeatureResponse> getModuleFeatures(@PathVariable Long id) {
+        return serviceImpl.getModuleFeatures(id);
+    }
+
+    @GetMapping("/search")
+    public List<ModuleResponse> searchModules(@RequestParam String keyword) {
+        return serviceImpl.searchModules(keyword);
     }
 }

@@ -5,6 +5,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "modules")
@@ -17,6 +19,10 @@ public class Module {
     private String name;
     private String description;
     private String icon;
+
+    @ManyToMany
+    @JoinTable(name = "module_features", joinColumns = @JoinColumn(name = "module_id"), inverseJoinColumns = @JoinColumn(name = "feature_id"))
+    private Set<Feature> features = new HashSet<>();
 
     @Column(nullable = false)
     private Boolean isActive = true;
@@ -72,6 +78,14 @@ public class Module {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public Set<Feature> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(Set<Feature> features) {
+        this.features = features;
     }
 
     public Boolean getIsActive() {

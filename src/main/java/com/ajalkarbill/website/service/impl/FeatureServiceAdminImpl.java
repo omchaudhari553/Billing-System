@@ -41,9 +41,10 @@ public class FeatureServiceAdminImpl implements FeatureServiceAdmin {
         feature.setTitle(request.getTitle());
         feature.setDescription(request.getDescription());
         feature.setIcon(request.getIcon());
+        feature.setCategory(request.getCategory());
         feature.setIsActive(request.getIsActive());
         feature.setDisplayOrder(request.getDisplayOrder());
-        
+
         Feature savedFeature = featureRepository.save(feature);
         return mapToResponse(savedFeature);
     }
@@ -52,13 +53,14 @@ public class FeatureServiceAdminImpl implements FeatureServiceAdmin {
     public FeatureResponse updateFeature(Long id, FeatureRequest request) {
         Feature feature = featureRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Feature not found with id: " + id));
-        
+
         feature.setTitle(request.getTitle());
         feature.setDescription(request.getDescription());
         feature.setIcon(request.getIcon());
+        feature.setCategory(request.getCategory());
         feature.setIsActive(request.getIsActive());
         feature.setDisplayOrder(request.getDisplayOrder());
-        
+
         Feature savedFeature = featureRepository.save(feature);
         return mapToResponse(savedFeature);
     }
@@ -77,12 +79,25 @@ public class FeatureServiceAdminImpl implements FeatureServiceAdmin {
                 .collect(Collectors.toList());
     }
 
+    public List<FeatureResponse> getFeaturesByCategory(String category) {
+        return featureRepository.findByCategoryAndIsActiveTrue(category).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<FeatureResponse> searchFeatures(String keyword) {
+        return featureRepository.searchFeatures(keyword).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private FeatureResponse mapToResponse(Feature feature) {
         FeatureResponse response = new FeatureResponse();
         response.setId(feature.getId());
         response.setTitle(feature.getTitle());
         response.setDescription(feature.getDescription());
         response.setIcon(feature.getIcon());
+        response.setCategory(feature.getCategory());
         response.setIsActive(feature.getIsActive());
         response.setDisplayOrder(feature.getDisplayOrder());
         response.setCreatedAt(feature.getCreatedAt());

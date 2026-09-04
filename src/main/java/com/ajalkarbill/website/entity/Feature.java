@@ -17,6 +17,7 @@ public class Feature {
     private String title;
     private String description;
     private String icon;
+    private String category;
 
     @Column(nullable = false)
     private Boolean isActive = true;
@@ -72,6 +73,14 @@ public class Feature {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Boolean getIsActive() {

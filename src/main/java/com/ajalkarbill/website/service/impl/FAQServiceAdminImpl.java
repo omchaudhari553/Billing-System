@@ -40,9 +40,12 @@ public class FAQServiceAdminImpl implements FAQServiceAdmin {
         FAQ faq = new FAQ();
         faq.setQuestion(request.getQuestion());
         faq.setAnswer(request.getAnswer());
+        faq.setCategory(request.getCategory());
+        faq.setHelpfulCount(request.getHelpfulCount() != null ? request.getHelpfulCount() : 0);
+        faq.setIsFeatured(request.getIsFeatured() != null ? request.getIsFeatured() : false);
         faq.setIsActive(request.getIsActive());
         faq.setDisplayOrder(request.getDisplayOrder());
-        
+
         FAQ savedFAQ = faqRepository.save(faq);
         return mapToResponse(savedFAQ);
     }
@@ -51,12 +54,19 @@ public class FAQServiceAdminImpl implements FAQServiceAdmin {
     public FAQResponse updateFAQ(Long id, FAQRequest request) {
         FAQ faq = faqRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("FAQ not found with id: " + id));
-        
+
         faq.setQuestion(request.getQuestion());
         faq.setAnswer(request.getAnswer());
+        faq.setCategory(request.getCategory());
+        if (request.getHelpfulCount() != null) {
+            faq.setHelpfulCount(request.getHelpfulCount());
+        }
+        if (request.getIsFeatured() != null) {
+            faq.setIsFeatured(request.getIsFeatured());
+        }
         faq.setIsActive(request.getIsActive());
         faq.setDisplayOrder(request.getDisplayOrder());
-        
+
         FAQ savedFAQ = faqRepository.save(faq);
         return mapToResponse(savedFAQ);
     }
@@ -75,11 +85,44 @@ public class FAQServiceAdminImpl implements FAQServiceAdmin {
                 .collect(Collectors.toList());
     }
 
+    public List<String> getCategories() {
+        return faqRepository.findDistinctCategoryByIsActiveTrue();
+    }
+
+    public List<FAQResponse> getFAQsByCategory(String category) {
+        return faqRepository.findByCategoryAndIsActiveTrue(category).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<FAQResponse> searchFAQs(String keyword) {
+        return faqRepository.searchFAQs(keyword).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<FAQResponse> getPopularFAQs() {
+        return faqRepository.findByIsFeaturedTrueAndIsActiveTrueOrderByHelpfulCountDesc().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public void markAsHelpful(Long id) {
+        FAQ faq = faqRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("FAQ not found with id: " + id));
+        Integer currentCount = faq.getHelpfulCount();
+        faq.setHelpfulCount(currentCount != null ? currentCount + 1 : 1);
+        faqRepository.save(faq);
+    }
+
     private FAQResponse mapToResponse(FAQ faq) {
         FAQResponse response = new FAQResponse();
         response.setId(faq.getId());
         response.setQuestion(faq.getQuestion());
         response.setAnswer(faq.getAnswer());
+        response.setCategory(faq.getCategory());
+        response.setHelpfulCount(faq.getHelpfulCount());
+        response.setIsFeatured(faq.getIsFeatured());
         response.setIsActive(faq.getIsActive());
         response.setDisplayOrder(faq.getDisplayOrder());
         response.setCreatedAt(faq.getCreatedAt());

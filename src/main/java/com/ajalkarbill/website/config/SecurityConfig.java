@@ -59,13 +59,16 @@ public class SecurityConfig {
                         .requestMatchers("/", "/error").permitAll()
 
                         // Swagger UI and API Docs - No authentication required
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html",
+                                "/swagger-ui/index.html")
+                        .permitAll()
 
                         // Public APIs - No authentication required
-                        .requestMatchers("/api/public/**", "/api/faqs", "/api/features", "/api/modules",
-                                "/api/testimonials", "/api/downloads")
+                        .requestMatchers("/api/public/**", "/api/faqs/**", "/api/features/**", "/api/modules/**",
+                                "/api/testimonials/**", "/api/downloads/**")
                         .permitAll()
-                        .requestMatchers("/api/contact-enquiries", "/api/contact-enquiries/**").permitAll()
+                        .requestMatchers("/api/contact-enquiries/**", "/api/enquiries/**")
+                        .permitAll()
 
                         // Admin Auth - Login endpoint
                         .requestMatchers("/api/admin/auth/login").permitAll()

@@ -1,7 +1,9 @@
 package com.ajalkarbill.website.service.impl;
 
+import com.ajalkarbill.website.dto.FeatureResponse;
 import com.ajalkarbill.website.dto.ModuleRequest;
 import com.ajalkarbill.website.dto.ModuleResponse;
+import com.ajalkarbill.website.entity.Feature;
 import com.ajalkarbill.website.entity.Module;
 import com.ajalkarbill.website.repository.ModuleRepository;
 import com.ajalkarbill.website.service.ModuleServiceAdmin;
@@ -43,7 +45,7 @@ public class ModuleServiceAdminImpl implements ModuleServiceAdmin {
         module.setIcon(request.getIcon());
         module.setIsActive(request.getIsActive());
         module.setDisplayOrder(request.getDisplayOrder());
-        
+
         Module savedModule = moduleRepository.save(module);
         return mapToResponse(savedModule);
     }
@@ -52,13 +54,13 @@ public class ModuleServiceAdminImpl implements ModuleServiceAdmin {
     public ModuleResponse updateModule(Long id, ModuleRequest request) {
         Module module = moduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Module not found with id: " + id));
-        
+
         module.setName(request.getName());
         module.setDescription(request.getDescription());
         module.setIcon(request.getIcon());
         module.setIsActive(request.getIsActive());
         module.setDisplayOrder(request.getDisplayOrder());
-        
+
         Module savedModule = moduleRepository.save(module);
         return mapToResponse(savedModule);
     }
@@ -77,16 +79,47 @@ public class ModuleServiceAdminImpl implements ModuleServiceAdmin {
                 .collect(Collectors.toList());
     }
 
+    public List<ModuleResponse> searchModules(String keyword) {
+        return moduleRepository.searchModules(keyword).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<FeatureResponse> getModuleFeatures(Long moduleId) {
+        Module module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new RuntimeException("Module not found with id: " + moduleId));
+        return module.getFeatures().stream()
+                .map(this::mapFeatureToResponse)
+                .collect(Collectors.toList());
+    }
+
     private ModuleResponse mapToResponse(Module module) {
         ModuleResponse response = new ModuleResponse();
         response.setId(module.getId());
         response.setName(module.getName());
         response.setDescription(module.getDescription());
         response.setIcon(module.getIcon());
+        response.setFeatures(module.getFeatures().stream()
+                .map(this::mapFeatureToResponse)
+                .collect(Collectors.toList()));
         response.setIsActive(module.getIsActive());
         response.setDisplayOrder(module.getDisplayOrder());
         response.setCreatedAt(module.getCreatedAt());
         response.setUpdatedAt(module.getUpdatedAt());
+        return response;
+    }
+
+    private FeatureResponse mapFeatureToResponse(Feature feature) {
+        FeatureResponse response = new FeatureResponse();
+        response.setId(feature.getId());
+        response.setTitle(feature.getTitle());
+        response.setDescription(feature.getDescription());
+        response.setIcon(feature.getIcon());
+        response.setCategory(feature.getCategory());
+        response.setIsActive(feature.getIsActive());
+        response.setDisplayOrder(feature.getDisplayOrder());
+        response.setCreatedAt(feature.getCreatedAt());
+        response.setUpdatedAt(feature.getUpdatedAt());
         return response;
     }
 }
