@@ -1,6 +1,7 @@
 package com.ajalkarbill.website.config;
 
 import com.ajalkarbill.website.security.JwtAuthenticationFilter;
+import com.ajalkarbill.website.security.WebsiteUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,12 +23,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final com.ajalkarbill.website.security.AdminUserDetailsService adminUserDetailsService;
+    private final WebsiteUserDetailsService websiteUserDetailsService;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-            com.ajalkarbill.website.security.AdminUserDetailsService adminUserDetailsService) {
+            WebsiteUserDetailsService websiteUserDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.adminUserDetailsService = adminUserDetailsService;
+        this.websiteUserDetailsService = websiteUserDetailsService;
     }
 
     @Bean
@@ -38,7 +39,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(adminUserDetailsService);
+        authProvider.setUserDetailsService(websiteUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -69,6 +70,19 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/contact-enquiries/**", "/api/enquiries/**")
                         .permitAll()
+                        .requestMatchers("/api/leads/**")
+                        .permitAll()
+
+                        // Public Analytics APIs - No authentication required for visitor tracking
+                        .requestMatchers("/api/public/analytics/**")
+                        .permitAll()
+
+                        // Existing visitor tracking APIs - No authentication required
+                        .requestMatchers("/api/visitors/**", "/api/visitors/activity/**")
+                        .permitAll()
+
+                        // Public Auth - Login, Register, Forgot Password, Reset Password endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
 
                         // Admin Auth - Login endpoint
                         .requestMatchers("/api/admin/auth/login").permitAll()
