@@ -7,6 +7,8 @@ import com.ajalkarbill.website.exception.MaxOtpAttemptsExceededException;
 import com.ajalkarbill.website.exception.OtpExpiredException;
 import com.ajalkarbill.website.repository.PasswordResetOtpRepository;
 import com.ajalkarbill.website.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,14 +20,20 @@ import java.util.Base64;
 @Service
 public class PasswordResetService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PasswordResetService.class);
+
     private final PasswordResetOtpRepository passwordResetOtpRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    private static final int OTP_EXPIRY_MINUTES = 5;
-    private static final int RESET_TOKEN_EXPIRY_MINUTES = 15;
+    private static final int OTP_EXPIRY_MINUTES = 15;
+    private static final int RESET_TOKEN_EXPIRY_MINUTES = 60;
     private static final int MAX_OTP_ATTEMPTS = 5;
+
+    // Development mode flag - set to true to log OTP to console instead of sending
+    // email
+    private static final boolean DEVELOPMENT_MODE = false;
 
     public PasswordResetService(
             PasswordResetOtpRepository passwordResetOtpRepository,
@@ -56,13 +64,22 @@ public class PasswordResetService {
             PasswordResetOtp passwordResetOtp = new PasswordResetOtp(
                     email,
                     otpHash,
-                    LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES)
-            );
+                    LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES));
 
             passwordResetOtpRepository.save(passwordResetOtp);
 
-            // Send OTP email
-            emailService.sendOtpEmail(email, otp);
+            // In development mode, log OTP to console instead of sending email
+            if (DEVELOPMENT_MODE) {
+                logger.info("========================================");
+                logger.info("DEVELOPMENT MODE - OTP LOGGED TO CONSOLE");
+                logger.info("Email: {}", email);
+                logger.info("OTP: {}", otp);
+                logger.info("Expires in: {} minutes", OTP_EXPIRY_MINUTES);
+                logger.info("========================================");
+            } else {
+                // Send OTP email
+                emailService.sendOtpEmail(email, otp);
+            }
         });
     }
 
