@@ -1,6 +1,7 @@
 package com.ajalkarbill.website.controller;
 
 import com.ajalkarbill.website.dto.LeadRequestDto;
+import com.ajalkarbill.website.dto.PhoneCaptureDto;
 import com.ajalkarbill.website.service.WebsiteLeadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,6 +32,17 @@ public class WebsiteLeadController {
     })
     public ResponseEntity<Map<String, Object>> submitLead(@Valid @RequestBody LeadRequestDto request) {
         Map<String, Object> response = leadService.createLead(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/phone")
+    @Operation(summary = "Capture phone number", description = "Capture visitor phone number from registration form before completion - phone number submitted voluntarily")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Phone number captured successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error or duplicate phone number")
+    })
+    public ResponseEntity<Map<String, Object>> capturePhone(@Valid @RequestBody PhoneCaptureDto request) {
+        Map<String, Object> response = leadService.capturePhone(request);
         return ResponseEntity.ok(response);
     }
 }

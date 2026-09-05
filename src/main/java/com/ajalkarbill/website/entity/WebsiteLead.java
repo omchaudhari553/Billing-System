@@ -8,11 +8,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "website_leads", indexes = {
-    @Index(name = "idx_visitor_id", columnList = "visitorId"),
-    @Index(name = "idx_phone_number", columnList = "phoneNumber"),
-    @Index(name = "idx_email", columnList = "email"),
-    @Index(name = "idx_lead_source", columnList = "source"),
-    @Index(name = "idx_created_at", columnList = "createdAt")
+        @Index(name = "idx_visitor_id", columnList = "visitorId"),
+        @Index(name = "idx_phone_number", columnList = "phoneNumber"),
+        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_lead_source", columnList = "source"),
+        @Index(name = "idx_registered", columnList = "registered"),
+        @Index(name = "idx_visitor_phone", columnList = "visitorId, phoneNumber"),
+        @Index(name = "idx_created_at", columnList = "createdAt")
 })
 public class WebsiteLead {
 
@@ -23,7 +25,7 @@ public class WebsiteLead {
     @Column(length = 64)
     private String visitorId;
 
-    @Column(nullable = false)
+    @Column
     private String fullName;
 
     @Column(nullable = false, length = 15)
@@ -45,6 +47,9 @@ public class WebsiteLead {
     @Column(length = 20)
     private String status = "NEW";
 
+    @Column(nullable = false)
+    private Boolean registered = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -65,6 +70,7 @@ public class WebsiteLead {
         PRICING_ENQUIRY,
         WHATSAPP,
         NEWSLETTER,
+        REGISTRATION_FORM,
         OTHER
     }
 
@@ -148,6 +154,14 @@ public class WebsiteLead {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Boolean getRegistered() {
+        return registered;
+    }
+
+    public void setRegistered(Boolean registered) {
+        this.registered = registered;
     }
 
     public LocalDateTime getCreatedAt() {

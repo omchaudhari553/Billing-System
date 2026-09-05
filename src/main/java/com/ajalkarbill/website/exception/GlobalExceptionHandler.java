@@ -105,4 +105,28 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidOtpException(InvalidOtpException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("success", "false");
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<Map<String, String>> handleOtpExpiredException(OtpExpiredException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("success", "false");
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxOtpAttemptsExceededException.class)
+    public ResponseEntity<Map<String, String>> handleMaxOtpAttemptsExceededException(MaxOtpAttemptsExceededException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("success", "false");
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

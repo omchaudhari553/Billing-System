@@ -17,9 +17,15 @@ public interface WebsiteLeadRepository extends JpaRepository<WebsiteLead, Long> 
 
     Optional<WebsiteLead> findByEmail(String email);
 
+    Optional<WebsiteLead> findByVisitorId(String visitorId);
+
+    Optional<WebsiteLead> findByVisitorIdAndPhoneNumber(String visitorId, String phoneNumber);
+
     boolean existsByPhoneNumber(String phoneNumber);
 
     boolean existsByEmail(String email);
+
+    boolean existsByVisitorIdAndPhoneNumber(String visitorId, String phoneNumber);
 
     List<WebsiteLead> findBySourceOrderByCreatedAtDesc(WebsiteLead.LeadSource source);
 

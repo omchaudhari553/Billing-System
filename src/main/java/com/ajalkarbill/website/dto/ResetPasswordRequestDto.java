@@ -1,13 +1,18 @@
 package com.ajalkarbill.website.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class ResetPasswordRequestDto {
 
-    @NotBlank(message = "Token is required")
-    private String token;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @NotBlank(message = "Reset token is required")
+    private String resetToken;
 
     @NotBlank(message = "New password is required")
     @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
@@ -21,12 +26,20 @@ public class ResetPasswordRequestDto {
     public ResetPasswordRequestDto() {
     }
 
-    public String getToken() {
-        return token;
+    public String getEmail() {
+        return email;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 
     public String getNewPassword() {

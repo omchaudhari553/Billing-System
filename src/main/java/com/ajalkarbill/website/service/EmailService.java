@@ -146,6 +146,24 @@ public class EmailService {
         }
     }
 
+    @Async
+    public void sendOtpEmail(String email, String otp) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject("Password Reset OTP - Ajalkar Billing Website");
+
+            String htmlContent = buildOtpEmailTemplate(otp);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            System.err.println("Failed to send OTP email: " + e.getMessage());
+        }
+    }
+
     private String buildPasswordResetEmailTemplate(String resetUrl) {
         return "<html><body style='font-family: Arial, sans-serif; color: #333; background-color: #f4f6f9; padding: 20px;'>"
                 +
@@ -169,6 +187,27 @@ public class EmailService {
                 "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'/>" +
                 "<p style='font-size: 12px; color: #666;'>Need help? Contact us at <a href='mailto:support@ajalkarinfotechindia.com'>support@ajalkarinfotechindia.com</a></p>"
                 +
+                "</div>" +
+                "</div></body></html>";
+    }
+
+    private String buildOtpEmailTemplate(String otp) {
+        return "<html><body style='font-family: Arial, sans-serif; color: #333; background-color: #f4f6f9; padding: 20px;'>" +
+                "<div style='max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);'>" +
+                "<div style='background: " + BRAND_COLOR + "; padding: 20px; text-align: center; color: white;'>" +
+                "<h2>Password Reset OTP</h2>" +
+                "</div>" +
+                "<div style='padding: 20px;'>" +
+                "<p>Hello,</p>" +
+                "<p>We received a request to reset your password.</p>" +
+                "<p>Your OTP is:</p>" +
+                "<div style='margin: 20px 0; padding: 20px; background: #f8fafc; border-radius: 6px; text-align: center;'>" +
+                "<span style='color: " + BRAND_COLOR + "; font-size: 2em; font-weight: bold; letter-spacing: 5px;'>" + otp + "</span>" +
+                "</div>" +
+                "<p>This OTP is valid for 5 minutes.</p>" +
+                "<p style='margin-top: 20px; font-size: 12px; color: #999;'>If you did not request a password reset, please ignore this email.</p>" +
+                "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'/>" +
+                "<p style='font-size: 12px; color: #666;'>Regards,<br/>Ajalkar Billing Website Team</p>" +
                 "</div>" +
                 "</div></body></html>";
     }

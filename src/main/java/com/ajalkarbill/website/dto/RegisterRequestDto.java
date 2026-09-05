@@ -51,6 +51,9 @@ public class RegisterRequestDto {
 
     private Boolean terms;
 
+    @Size(max = 64, message = "Visitor ID must be at most 64 characters")
+    private String visitorId;
+
     public RegisterRequestDto() {
     }
 
@@ -108,5 +111,13 @@ public class RegisterRequestDto {
 
     public void setTerms(Boolean terms) {
         this.terms = terms;
+    }
+
+    public String getVisitorId() {
+        return visitorId;
+    }
+
+    public void setVisitorId(String visitorId) {
+        this.visitorId = visitorId;
     }
 }

@@ -102,6 +102,7 @@ public class AnalyticsService {
         leadsBySource.put("PRICING_ENQUIRY", leadService.countBySource(WebsiteLead.LeadSource.PRICING_ENQUIRY));
         leadsBySource.put("WHATSAPP", leadService.countBySource(WebsiteLead.LeadSource.WHATSAPP));
         leadsBySource.put("NEWSLETTER", leadService.countBySource(WebsiteLead.LeadSource.NEWSLETTER));
+        leadsBySource.put("REGISTRATION_FORM", leadService.countBySource(WebsiteLead.LeadSource.REGISTRATION_FORM));
         leadsBySource.put("OTHER", leadService.countBySource(WebsiteLead.LeadSource.OTHER));
 
         stats.put("leadsBySource", leadsBySource);
