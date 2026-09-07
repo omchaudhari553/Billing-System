@@ -56,43 +56,68 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
+
                         // Root path and error pages - No authentication required
                         .requestMatchers("/", "/error").permitAll()
 
                         // Swagger UI and API Docs - No authentication required
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html",
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
                                 "/swagger-ui/index.html")
                         .permitAll()
 
                         // Public APIs - No authentication required
-                        .requestMatchers("/api/public/**", "/api/faqs/**", "/api/features/**", "/api/modules/**",
-                                "/api/testimonials/**", "/api/downloads/**")
+                        .requestMatchers(
+                                "/api/public/**",
+                                "/api/faqs/**",
+                                "/api/features/**",
+                                "/api/modules/**",
+                                "/api/testimonials/**",
+                                "/api/downloads/**")
                         .permitAll()
-                        .requestMatchers("/api/contact-enquiries/**", "/api/enquiries/**")
+
+                        .requestMatchers(
+                                "/api/contact-enquiries/**",
+                                "/api/enquiries/**")
                         .permitAll()
+
                         .requestMatchers("/api/leads/**")
                         .permitAll()
 
-                        // Public Analytics APIs - No authentication required for visitor tracking
+                        // Public Analytics APIs
                         .requestMatchers("/api/public/analytics/**")
                         .permitAll()
 
-                        // Existing visitor tracking APIs - No authentication required
-                        .requestMatchers("/api/visitors/**", "/api/visitors/activity/**")
+                        // Existing visitor tracking APIs
+                        .requestMatchers(
+                                "/api/visitors/**",
+                                "/api/visitors/activity/**")
                         .permitAll()
 
-                        // Public Auth - Login, Register, Forgot Password, Reset Password endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Public Authentication APIs
+                        .requestMatchers("/api/auth/**")
+                        .permitAll()
 
-                        // Admin Auth - Login endpoint
-                        .requestMatchers("/api/admin/auth/login").permitAll()
+                        // Admin Login
+                        .requestMatchers("/api/admin/auth/login")
+                        .permitAll()
 
-                        // Admin APIs - Authentication required
-                        .requestMatchers("/api/admin/**").authenticated()
+                        // ADMIN role required for all admin APIs
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
+
+                        // USER role required for user APIs
+                        .requestMatchers("/api/user/**")
+                        .hasRole("USER")
 
                         // Any other request - deny
                         .anyRequest().denyAll())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -152,7 +152,6 @@ public class AnalyticsService {
                     Map<String, Object> item = new HashMap<>();
                     item.put("pageUrl", row[0]);
                     item.put("pageTitle", row[1]);
-                    item.put("viewCount", row[2]);
                     return item;
                 })
                 .toList();
@@ -164,7 +163,6 @@ public class AnalyticsService {
                     Map<String, Object> item = new HashMap<>();
                     item.put("featureId", row[0]);
                     item.put("featureName", row[1]);
-                    item.put("viewCount", row[2]);
                     return item;
                 })
                 .toList();
@@ -176,7 +174,6 @@ public class AnalyticsService {
                     Map<String, Object> item = new HashMap<>();
                     item.put("moduleId", row[0]);
                     item.put("moduleName", row[1]);
-                    item.put("viewCount", row[2]);
                     return item;
                 })
                 .toList();
@@ -188,7 +185,6 @@ public class AnalyticsService {
                     Map<String, Object> item = new HashMap<>();
                     item.put("faqId", row[0]);
                     item.put("question", row[1]);
-                    item.put("viewCount", row[2]);
                     return item;
                 })
                 .toList();
