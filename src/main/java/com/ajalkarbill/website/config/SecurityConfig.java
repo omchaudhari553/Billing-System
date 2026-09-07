@@ -4,6 +4,7 @@ import com.ajalkarbill.website.security.JwtAuthenticationFilter;
 import com.ajalkarbill.website.security.WebsiteUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -78,9 +79,10 @@ public class SecurityConfig {
                                 "/api/downloads/**")
                         .permitAll()
 
-                        .requestMatchers(
-                                "/api/contact-enquiries/**",
-                                "/api/enquiries/**")
+                        .requestMatchers(HttpMethod.POST, "/api/enquiries").permitAll()
+                        .requestMatchers("/api/enquiries/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/contact-enquiries/**")
                         .permitAll()
 
                         .requestMatchers("/api/leads/**")
