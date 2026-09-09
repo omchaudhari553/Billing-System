@@ -6,15 +6,19 @@ public class LoginResponseDto {
     private String message;
     private String token;
     private String tokenType;
+    private String role;
+    private String username;
 
     public LoginResponseDto() {
     }
 
-    public LoginResponseDto(boolean success, String message, String token, String tokenType) {
+    public LoginResponseDto(boolean success, String message, String token, String tokenType, String role, String username) {
         this.success = success;
         this.message = message;
         this.token = token;
         this.tokenType = tokenType;
+        this.role = role;
+        this.username = username;
     }
 
     public boolean isSuccess() {
@@ -47,5 +51,21 @@ public class LoginResponseDto {
 
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

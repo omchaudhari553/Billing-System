@@ -98,12 +98,8 @@ public class SecurityConfig {
                                 "/api/visitors/activity/**")
                         .permitAll()
 
-                        // Public Authentication APIs
+                        // Public Authentication APIs (including unified login)
                         .requestMatchers("/api/auth/**")
-                        .permitAll()
-
-                        // Admin Login
-                        .requestMatchers("/api/admin/auth/login")
                         .permitAll()
 
                         // ADMIN role required for all admin APIs

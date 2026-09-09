@@ -1,5 +1,6 @@
 package com.ajalkarbill.website.service;
 
+import com.ajalkarbill.website.config.AdminProperties;
 import com.ajalkarbill.website.dto.ForgotPasswordRequestDto;
 import com.ajalkarbill.website.dto.LoginRequestDto;
 import com.ajalkarbill.website.dto.LoginResponseDto;
@@ -10,12 +11,14 @@ import com.ajalkarbill.website.entity.User;
 import com.ajalkarbill.website.exception.DuplicateEmailException;
 import com.ajalkarbill.website.exception.DuplicateMobileException;
 import com.ajalkarbill.website.repository.UserRepository;
+import com.ajalkarbill.website.security.ConfiguredAdminUserDetails;
 import com.ajalkarbill.website.security.JwtUtil;
 import com.ajalkarbill.website.service.WebsiteLeadService;
 import com.ajalkarbill.website.service.WebsiteVisitorService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,7 @@ public class AuthService {
         private final PasswordResetService passwordResetService;
         private final WebsiteVisitorService visitorService;
         private final WebsiteLeadService leadService;
+        private final AdminProperties adminProperties;
 
         public AuthService(
                         AuthenticationManager authenticationManager,
@@ -41,7 +45,8 @@ public class AuthService {
                         PasswordEncoder passwordEncoder,
                         PasswordResetService passwordResetService,
                         WebsiteVisitorService visitorService,
-                        WebsiteLeadService leadService) {
+                        WebsiteLeadService leadService,
+                        AdminProperties adminProperties) {
                 this.authenticationManager = authenticationManager;
                 this.jwtUtil = jwtUtil;
                 this.userRepository = userRepository;
@@ -49,25 +54,68 @@ public class AuthService {
                 this.passwordResetService = passwordResetService;
                 this.visitorService = visitorService;
                 this.leadService = leadService;
+                this.adminProperties = adminProperties;
         }
 
         /**
-         * USER LOGIN
+         * UNIFIED LOGIN - Checks admin credentials first, then database users
          */
         public LoginResponseDto login(LoginRequestDto request) {
+                String email = request.getEmail();
+                String password = request.getPassword();
 
+                // First check if credentials match configured admin
+                if (email.equals(adminProperties.getUsername()) && 
+                    password.equals(adminProperties.getPassword())) {
+                        
+                        // Authenticate as configured admin
+                        ConfiguredAdminUserDetails adminDetails = new ConfiguredAdminUserDetails(
+                                adminProperties.getUsername(),
+                                adminProperties.getPassword(),
+                                adminProperties.getRole()
+                        );
+                        
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                                adminDetails,
+                                null,
+                                adminDetails.getAuthorities()
+                        );
+                        
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        String token = jwtUtil.generateToken(authentication);
+
+                        return new LoginResponseDto(
+                                true,
+                                "Admin login successful",
+                                token,
+                                "Bearer",
+                                adminProperties.getRole(),
+                                adminProperties.getUsername()
+                        );
+                }
+
+                // If not admin, authenticate against database
                 Authentication authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
-                                                request.getEmail(),
-                                                request.getPassword()));
+                                                email,
+                                                password));
 
                 String token = jwtUtil.generateToken(authentication);
+                
+                // Extract role from authentication
+                String role = authentication.getAuthorities().stream()
+                                .findFirst()
+                                .map(authority -> authority.getAuthority())
+                                .orElse("ROLE_USER")
+                                .replace("ROLE_", "");
 
                 return new LoginResponseDto(
                                 true,
                                 "Login successful",
                                 token,
-                                "Bearer");
+                                "Bearer",
+                                role,
+                                email);
         }
 
         /**
