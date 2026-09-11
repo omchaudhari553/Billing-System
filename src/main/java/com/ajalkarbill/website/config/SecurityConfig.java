@@ -26,8 +26,10 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final WebsiteUserDetailsService websiteUserDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
             WebsiteUserDetailsService websiteUserDetailsService) {
+
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.websiteUserDetailsService = websiteUserDetailsService;
     }
@@ -40,22 +42,31 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
         authProvider.setUserDetailsService(websiteUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+
         return authProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+
         return config.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authenticationProvider(authenticationProvider())
+
                 .authorizeHttpRequests(auth -> auth
 
                         // Root path and error pages - No authentication required
@@ -79,8 +90,11 @@ public class SecurityConfig {
                                 "/api/downloads/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/enquiries").permitAll()
-                        .requestMatchers("/api/enquiries/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/enquiries")
+                        .permitAll()
+
+                        .requestMatchers("/api/enquiries/**")
+                        .hasRole("ADMIN")
 
                         .requestMatchers("/api/contact-enquiries/**")
                         .permitAll()
@@ -102,7 +116,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**")
                         .permitAll()
 
-                        // ADMIN role required for all admin APIs
+                        // Admin login - No authentication required
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/admin/auth/login")
+                        .permitAll()
+
+                        // ADMIN role required for all other admin APIs
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
 
@@ -111,7 +131,8 @@ public class SecurityConfig {
                         .hasRole("USER")
 
                         // Any other request - deny
-                        .anyRequest().denyAll())
+                        .anyRequest()
+                        .denyAll())
 
                 .addFilterBefore(
                         jwtAuthenticationFilter,
