@@ -19,6 +19,9 @@ public class Feature {
     private String icon;
     private String category;
 
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
+
     @Column(nullable = false)
     private Boolean isActive = true;
 
@@ -81,6 +84,14 @@ public class Feature {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Boolean getIsActive() {

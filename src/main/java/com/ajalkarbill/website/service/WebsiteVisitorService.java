@@ -17,10 +17,12 @@ public class WebsiteVisitorService {
 
     private final WebsiteVisitorRepository visitorRepository;
     private final UserRepository userRepository;
+    private final AutoExcelExportService autoExcelExportService;
 
-    public WebsiteVisitorService(WebsiteVisitorRepository visitorRepository, UserRepository userRepository) {
+    public WebsiteVisitorService(WebsiteVisitorRepository visitorRepository, UserRepository userRepository, AutoExcelExportService autoExcelExportService) {
         this.visitorRepository = visitorRepository;
         this.userRepository = userRepository;
+        this.autoExcelExportService = autoExcelExportService;
     }
 
     @Transactional
@@ -28,6 +30,8 @@ public class WebsiteVisitorService {
         Optional<WebsiteVisitor> existingVisitor = visitorRepository.findByVisitorId(request.getVisitorId());
 
         WebsiteVisitor visitor;
+        boolean isNewVisitor = !existingVisitor.isPresent();
+        
         if (existingVisitor.isPresent()) {
             visitor = existingVisitor.get();
             visitor.setLastVisitAt(LocalDateTime.now());
@@ -67,7 +71,19 @@ public class WebsiteVisitorService {
             visitor.setReferrer(request.getReferrer());
         }
 
-        return visitorRepository.save(visitor);
+        WebsiteVisitor savedVisitor = visitorRepository.save(visitor);
+        
+        // Trigger auto export on new visitor data
+        if (isNewVisitor && autoExcelExportService.isAutoExportEnabled()) {
+            try {
+                autoExcelExportService.exportOnNewData();
+            } catch (Exception e) {
+                // Log error but don't fail the visitor tracking
+                System.err.println("Error triggering auto export: " + e.getMessage());
+            }
+        }
+        
+        return savedVisitor;
     }
 
     @Transactional

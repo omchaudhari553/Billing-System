@@ -1,14 +1,18 @@
 package com.ajalkarbill.website.controller.admin;
 
 import com.ajalkarbill.website.service.AnalyticsService;
+import com.ajalkarbill.website.service.ExcelExportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -18,9 +22,11 @@ import java.util.Map;
 public class AdminAnalyticsController {
 
     private final AnalyticsService analyticsService;
+    private final ExcelExportService excelExportService;
 
-    public AdminAnalyticsController(AnalyticsService analyticsService) {
+    public AdminAnalyticsController(AnalyticsService analyticsService, ExcelExportService excelExportService) {
         this.analyticsService = analyticsService;
+        this.excelExportService = excelExportService;
     }
 
     @GetMapping("/overall")
@@ -95,5 +101,85 @@ public class AdminAnalyticsController {
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         Map<String, Object> stats = analyticsService.getDailyStatistics(date);
         return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/export/visitors")
+    @Operation(summary = "Export visitors to Excel", description = "Export all website visitors data to Excel file with phone numbers and lead information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Error generating Excel file")
+    })
+    public ResponseEntity<byte[]> exportVisitorsToExcel() throws IOException {
+        byte[] excelData = excelExportService.exportVisitorsToExcel();
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "website_visitors.xlsx");
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
+    }
+
+    @GetMapping("/export/activities")
+    @Operation(summary = "Export activities to Excel", description = "Export all website activities data to Excel file with visitor lead information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Error generating Excel file")
+    })
+    public ResponseEntity<byte[]> exportActivitiesToExcel() throws IOException {
+        byte[] excelData = excelExportService.exportActivitiesToExcel();
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "website_activities.xlsx");
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
+    }
+
+    @GetMapping("/export/leads")
+    @Operation(summary = "Export leads to Excel", description = "Export all website leads data to Excel file with contact information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Error generating Excel file")
+    })
+    public ResponseEntity<byte[]> exportLeadsToExcel() throws IOException {
+        byte[] excelData = excelExportService.exportLeadsToExcel();
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "website_leads.xlsx");
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
+    }
+
+    @GetMapping("/export/all")
+    @Operation(summary = "Export all data to Excel", description = "Export all website data (visitors, activities, leads) to a single Excel file with multiple sheets")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Error generating Excel file")
+    })
+    public ResponseEntity<byte[]> exportAllToExcel() throws IOException {
+        byte[] excelData = excelExportService.exportAllToExcel();
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "website_analytics_complete.xlsx");
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
     }
 }

@@ -16,10 +16,12 @@ public class WebsiteActivityService {
 
     private final WebsiteActivityRepository activityRepository;
     private final UserRepository userRepository;
+    private final AutoExcelExportService autoExcelExportService;
 
-    public WebsiteActivityService(WebsiteActivityRepository activityRepository, UserRepository userRepository) {
+    public WebsiteActivityService(WebsiteActivityRepository activityRepository, UserRepository userRepository, AutoExcelExportService autoExcelExportService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
+        this.autoExcelExportService = autoExcelExportService;
     }
 
     @Transactional
@@ -37,7 +39,19 @@ public class WebsiteActivityService {
             userOpt.ifPresent(activity::setUser);
         }
 
-        return activityRepository.save(activity);
+        WebsiteActivity savedActivity = activityRepository.save(activity);
+        
+        // Trigger auto export on new data
+        if (autoExcelExportService.isAutoExportEnabled()) {
+            try {
+                autoExcelExportService.exportOnNewData();
+            } catch (Exception e) {
+                // Log error but don't fail the activity tracking
+                System.err.println("Error triggering auto export: " + e.getMessage());
+            }
+        }
+        
+        return savedActivity;
     }
 
     public List<WebsiteActivity> getActivitiesByVisitorId(String visitorId) {

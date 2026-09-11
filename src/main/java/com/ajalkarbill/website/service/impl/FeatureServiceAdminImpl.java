@@ -42,6 +42,7 @@ public class FeatureServiceAdminImpl implements FeatureServiceAdmin {
         feature.setDescription(request.getDescription());
         feature.setIcon(request.getIcon());
         feature.setCategory(request.getCategory());
+        feature.setImageUrl(request.getImageUrl());
         feature.setIsActive(request.getIsActive());
         feature.setDisplayOrder(request.getDisplayOrder());
 
@@ -58,6 +59,9 @@ public class FeatureServiceAdminImpl implements FeatureServiceAdmin {
         feature.setDescription(request.getDescription());
         feature.setIcon(request.getIcon());
         feature.setCategory(request.getCategory());
+        if (request.getImageUrl() != null) {
+            feature.setImageUrl(request.getImageUrl());
+        }
         feature.setIsActive(request.getIsActive());
         feature.setDisplayOrder(request.getDisplayOrder());
 
@@ -98,6 +102,7 @@ public class FeatureServiceAdminImpl implements FeatureServiceAdmin {
         response.setDescription(feature.getDescription());
         response.setIcon(feature.getIcon());
         response.setCategory(feature.getCategory());
+        response.setImageUrl(feature.getImageUrl());
         response.setIsActive(feature.getIsActive());
         response.setDisplayOrder(feature.getDisplayOrder());
         response.setCreatedAt(feature.getCreatedAt());

@@ -9,6 +9,7 @@ public class FeatureResponse {
     private String description;
     private String icon;
     private String category;
+    private String imageUrl;
     private Boolean isActive;
     private Integer displayOrder;
     private LocalDateTime createdAt;
@@ -55,6 +56,14 @@ public class FeatureResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Boolean getIsActive() {

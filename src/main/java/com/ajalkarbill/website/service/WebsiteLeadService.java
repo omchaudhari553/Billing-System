@@ -22,12 +22,14 @@ public class WebsiteLeadService {
     private final WebsiteLeadRepository leadRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final AutoExcelExportService autoExcelExportService;
 
     public WebsiteLeadService(WebsiteLeadRepository leadRepository, UserRepository userRepository,
-            EmailService emailService) {
+            EmailService emailService, AutoExcelExportService autoExcelExportService) {
         this.leadRepository = leadRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.autoExcelExportService = autoExcelExportService;
     }
 
     @Transactional
@@ -57,6 +59,16 @@ public class WebsiteLeadService {
         response.put("success", true);
         response.put("message", "Lead submitted successfully");
         response.put("leadId", savedLead.getId());
+
+        // Trigger auto export on new data
+        if (autoExcelExportService.isAutoExportEnabled()) {
+            try {
+                autoExcelExportService.exportOnNewData();
+            } catch (Exception e) {
+                // Log error but don't fail the lead creation
+                System.err.println("Error triggering auto export: " + e.getMessage());
+            }
+        }
 
         return response;
     }
@@ -107,6 +119,16 @@ public class WebsiteLeadService {
         response.put("leadId", savedLead.getId());
         response.put("registered", false);
 
+        // Trigger auto export on new data
+        if (autoExcelExportService.isAutoExportEnabled()) {
+            try {
+                autoExcelExportService.exportOnNewData();
+            } catch (Exception e) {
+                // Log error but don't fail the phone capture
+                System.err.println("Error triggering auto export: " + e.getMessage());
+            }
+        }
+
         return response;
     }
 
@@ -134,7 +156,7 @@ public class WebsiteLeadService {
             associateLeadWithUser(leadOpt.get().getId(), userId);
         } else {
             // Try to find by visitorId only (in case phone number changed)
-            Optional<WebsiteLead> byVisitorId = leadRepository.findByVisitorId(visitorId);
+            Optional<WebsiteLead> byVisitorId = leadRepository.findFirstByVisitorIdOrderByCreatedAtDesc(visitorId);
             if (byVisitorId.isPresent() && !byVisitorId.get().getRegistered()) {
                 associateLeadWithUser(byVisitorId.get().getId(), userId);
             }
@@ -146,7 +168,7 @@ public class WebsiteLeadService {
     }
 
     public Optional<WebsiteLead> findByVisitorId(String visitorId) {
-        return leadRepository.findByVisitorId(visitorId);
+        return leadRepository.findFirstByVisitorIdOrderByCreatedAtDesc(visitorId);
     }
 
     public List<WebsiteLead> getLeadsBySource(WebsiteLead.LeadSource source) {

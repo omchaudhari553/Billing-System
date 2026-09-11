@@ -11,6 +11,7 @@ public class FeatureRequest {
     private String description;
     private String icon;
     private String category;
+    private String imageUrl;
 
     @NotNull(message = "Active status is required")
     private Boolean isActive;
@@ -51,6 +52,14 @@ public class FeatureRequest {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Boolean getIsActive() {

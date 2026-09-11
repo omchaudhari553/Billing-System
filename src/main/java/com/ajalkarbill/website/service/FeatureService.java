@@ -17,7 +17,7 @@ public class FeatureService {
 
     public List<FeatureDto> getAllFeatures() {
         return repository.findAll().stream()
-                .map(f -> new FeatureDto(f.getId(), f.getTitle(), f.getDescription(), f.getIcon()))
+                .map(f -> new FeatureDto(f.getId(), f.getTitle(), f.getDescription(), f.getIcon(), f.getImageUrl()))
                 .toList();
     }
 }
